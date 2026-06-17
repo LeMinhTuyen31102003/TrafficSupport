@@ -559,10 +559,21 @@
                     locationButton.removeAttribute('aria-busy');
                     appendMessage('user', 'Tôi đã gửi vị trí hiện tại.');
                     
-                    // Chuyển hướng ngay sang Zalo
-                    window.open('https://zalo.me/0988812116', '_blank');
+                    // Thử mở app Zalo bằng custom protocol, nếu không được mới dùng link web
+                    const zaloLink = 'zalo://conversation?phone=0988812116';
+                    const webLink = 'https://zalo.me/0988812116';
+                    
+                    // Tạo một liên kết ẩn để kích hoạt mở app
+                    const a = document.createElement('a');
+                    a.href = webLink; 
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
 
-                    appendTypingResponse(`Đang mở Zalo số 0988.812.116 để bạn gửi vị trí... <br><br>Vị trí của bạn: <a href="${mapsUrl}" target="_blank" class="text-primary underline font-bold">Xem bản đồ</a>.`, [
+                    appendTypingResponse(`Đang kết nối Zalo 0988.812.116... <br><br>Vị trí của bạn: <a href="${mapsUrl}" target="_blank" class="text-primary underline font-bold">Xem bản đồ</a>.`, [
+                        { label: 'Bấm nếu chưa mở Zalo', href: 'https://zalo.me/0988812116', icon: 'fa-comments' },
                         { label: 'Gọi hỗ trợ ngay', href: 'tel:0789999116', icon: 'fa-phone' }
                     ]);
                 }, function () {
