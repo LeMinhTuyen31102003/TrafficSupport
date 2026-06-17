@@ -157,11 +157,13 @@ body {
     transform: translateY(0) scale(1);
 }
 
-.support-chat__totop:hover {
-    color: #ffffff;
-    background: var(--chat-blue);
-    box-shadow: 0 18px 42px rgba(6, 39, 127, 0.28);
-    transform: translateY(-2px) scale(1.03);
+@media (hover: hover) and (pointer: fine) {
+    .support-chat__totop:hover {
+        color: #ffffff;
+        background: var(--chat-blue);
+        box-shadow: 0 18px 42px rgba(6, 39, 127, 0.28);
+        transform: translateY(-2px) scale(1.03);
+    }
 }
 
 .support-chat__totop:active {
