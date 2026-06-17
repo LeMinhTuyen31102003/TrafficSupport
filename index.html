@@ -442,6 +442,12 @@
             const form = chat.querySelector('[data-chat-form]');
             const input = form.querySelector('input');
             const locationButton = chat.querySelector('[data-chat-location]');
+            const locationButtons = chat.querySelectorAll('[data-chat-location], [data-chat-location-primary]');
+            const supportPhone = '0789999116';
+            const supportPhoneText = '0789.999.116';
+            const zaloPhone = '0988812116';
+            const zaloPhoneText = '0988.812.116';
+            const zaloUrl = `https://zalo.me/${zaloPhone}`;
 
             const responses = {
                 tow: {
@@ -466,23 +472,127 @@
                 },
                 operator: {
                     user: 'Gặp tổng đài viên',
-                    bot: 'Tổng đài cứu hộ đang sẵn sàng hỗ trợ. Bạn có thể gọi trực tiếp <a href="tel:0789999116" class="text-primary underline">0789.999.116</a> để được điều phối nhanh nhất.',
-                    actions: [{ label: 'Gọi 0789.999.116', href: 'tel:0789999116', icon: 'fa-phone' }]
+                    bot: `Tổng đài cứu hộ đang sẵn sàng hỗ trợ. Bạn có thể gọi trực tiếp ${supportPhoneText} để được điều phối nhanh nhất.`,
+                    actions: [{ label: `Gọi ${supportPhoneText}`, href: `tel:${supportPhone}`, icon: 'fa-phone' }]
                 }
             };
 
             function setChatOpen(isOpen) {
                 chat.classList.toggle('is-open', isOpen);
+                document.body.classList.toggle('support-chat-open', isOpen);
                 panel.setAttribute('aria-hidden', String(!isOpen));
                 openButton.setAttribute('aria-expanded', String(isOpen));
-                if (isOpen) {
+
+                if (isOpen && window.matchMedia('(min-width: 641px)').matches) {
                     requestAnimationFrame(() => input.focus({ preventScroll: true }));
+                    scrollMessages();
+                }
+
+                if (isOpen) {
                     scrollMessages();
                 }
             }
 
             function scrollMessages() {
                 messageList.scrollTop = messageList.scrollHeight;
+            }
+
+            function appendTextWithLinks(element, text) {
+                const textValue = String(text);
+                const phoneOrUrlPattern = /(https?:\/\/[^\s]+|0\d{2,3}[.\s-]?\d{3}[.\s-]?\d{3,4})/g;
+                let lastIndex = 0;
+                let match;
+
+                while ((match = phoneOrUrlPattern.exec(textValue)) !== null) {
+                    if (match.index > lastIndex) {
+                        element.appendChild(document.createTextNode(textValue.slice(lastIndex, match.index)));
+                    }
+
+                    const value = match[0];
+                    const anchor = document.createElement('a');
+
+                    if (value.startsWith('http')) {
+                        anchor.href = value;
+                        anchor.target = '_blank';
+                        anchor.rel = 'noopener noreferrer';
+                    } else {
+                        anchor.href = `tel:${value.replace(/\D/g, '')}`;
+                    }
+
+                    anchor.textContent = value;
+                    element.appendChild(anchor);
+                    lastIndex = phoneOrUrlPattern.lastIndex;
+                }
+
+                if (lastIndex < textValue.length) {
+                    element.appendChild(document.createTextNode(textValue.slice(lastIndex)));
+                }
+            }
+
+            function createMessageContent(text) {
+                const fragment = document.createDocumentFragment();
+                String(text).split('\n').forEach(function (line, index) {
+                    if (index > 0) {
+                        fragment.appendChild(document.createElement('br'));
+                    }
+
+                    appendTextWithLinks(fragment, line);
+                });
+
+                return fragment;
+            }
+
+            function setLocationLoading(isLoading) {
+                locationButtons.forEach(function (button) {
+                    button.classList.toggle('is-loading', isLoading);
+                    if (isLoading) {
+                        button.setAttribute('aria-busy', 'true');
+                    } else {
+                        button.removeAttribute('aria-busy');
+                    }
+                });
+            }
+
+            function fallbackCopyText(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.setAttribute('readonly', '');
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.select();
+
+                let copied = false;
+                try {
+                    copied = document.execCommand('copy');
+                } catch (error) {
+                    copied = false;
+                }
+
+                document.body.removeChild(textarea);
+                return copied;
+            }
+
+            function copyText(text) {
+                if (navigator.clipboard && window.isSecureContext) {
+                    return navigator.clipboard.writeText(text).then(function () {
+                        return true;
+                    }).catch(function () {
+                        return fallbackCopyText(text);
+                    });
+                }
+
+                return Promise.resolve(fallbackCopyText(text));
+            }
+
+            function openZalo() {
+                const anchor = document.createElement('a');
+                anchor.href = zaloUrl;
+                anchor.target = '_blank';
+                anchor.rel = 'noopener noreferrer';
+                document.body.appendChild(anchor);
+                anchor.click();
+                document.body.removeChild(anchor);
             }
 
             function appendMessage(role, text, actions) {
@@ -500,7 +610,7 @@
                 const bubble = document.createElement('div');
                 bubble.className = 'support-chat__bubble';
                 const paragraph = document.createElement('p');
-                paragraph.innerHTML = text;
+                paragraph.appendChild(createMessageContent(text));
                 bubble.appendChild(paragraph);
 
                 if (Array.isArray(actions) && actions.length) {
@@ -515,6 +625,10 @@
 
                         if (action.href) {
                             control.href = action.href;
+                            if (action.href.startsWith('http')) {
+                                control.target = '_blank';
+                                control.rel = 'noopener noreferrer';
+                            }
                             if (action.href.charAt(0) === '#') {
                                 control.addEventListener('click', function () {
                                     setChatOpen(false);
@@ -546,49 +660,37 @@
 
             function requestLocation() {
                 if (!navigator.geolocation) {
-                    appendMessage('bot', 'Trình duyệt của bạn chưa hỗ trợ gửi vị trí. Bạn có thể nhập địa chỉ hiện tại hoặc gọi <a href="tel:0789999116" class="text-primary underline">0789.999.116</a> để được hỗ trợ ngay.');
+                    appendMessage('bot', `Trình duyệt của bạn chưa hỗ trợ gửi vị trí. Bạn có thể nhập địa chỉ hiện tại hoặc gọi ${supportPhoneText} để được hỗ trợ ngay.`, [
+                        { label: `Gọi ${supportPhoneText}`, href: `tel:${supportPhone}`, icon: 'fa-phone' }
+                    ]);
                     return;
                 }
 
-                locationButton.classList.add('is-loading');
-                locationButton.setAttribute('aria-busy', 'true');
+                setLocationLoading(true);
 
                 navigator.geolocation.getCurrentPosition(function (position) {
                     const latitude = position.coords.latitude.toFixed(6);
                     const longitude = position.coords.longitude.toFixed(6);
                     const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                    const zaloMessage = `Tôi cần cứu hộ xe. Vị trí hiện tại của tôi: ${mapsUrl}`;
 
-                    locationButton.classList.remove('is-loading');
-                    locationButton.removeAttribute('aria-busy');
+                    setLocationLoading(false);
                     appendMessage('user', 'Tôi đã gửi vị trí hiện tại.');
-                    
-                    // Tự động copy link vị trí vào bộ nhớ đệm (Clipboard)
-                    const tempInput = document.createElement('input');
-                    tempInput.value = mapsUrl;
-                    document.body.appendChild(tempInput);
-                    tempInput.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(tempInput);
 
-                    // Thử mở app Zalo
-                    const webLink = 'https://zalo.me/0988812116';
-                    const a = document.createElement('a');
-                    a.href = webLink; 
-                    a.target = '_blank';
-                    a.rel = 'noopener noreferrer';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-
-                    appendTypingResponse(`Đã kết nối Zalo 0988.812.116. <br><br><b>Chúng tôi đã tự động copy vị trí của bạn:</b> <br><span class="text-xs text-slate-500">${mapsUrl}</span><br><br>Bạn chỉ cần <b>Dán (Paste)</b> vào trò chuyện Zalo và bấm gửi là xong!`, [
-                        { label: 'Mở lại Zalo', href: 'https://zalo.me/0988812116', icon: 'fa-comments' },
-                        { label: 'Gọi hỗ trợ ngay', href: 'tel:0789999116', icon: 'fa-phone' }
-                    ]);
+                    copyText(zaloMessage).then(function (copied) {
+                        openZalo();
+                        appendTypingResponse(
+                            `Đã mở Zalo ${zaloPhoneText}.\n${copied ? 'Nội dung vị trí đã được copy tự động.' : 'Trình duyệt không cho copy tự động, bạn có thể bấm vào link vị trí bên dưới để sao chép.'}\n${zaloMessage}\nBạn chỉ cần dán vào khung chat Zalo và bấm gửi.`,
+                            [
+                                { label: `Mở Zalo ${zaloPhoneText}`, href: zaloUrl, icon: 'fa-comments' },
+                                { label: `Gọi ${supportPhoneText}`, href: `tel:${supportPhone}`, icon: 'fa-phone' }
+                            ]
+                        );
+                    });
                 }, function () {
-                    locationButton.classList.remove('is-loading');
-                    locationButton.removeAttribute('aria-busy');
+                    setLocationLoading(false);
                     appendMessage('bot', 'Bạn chưa cấp quyền vị trí. Vui lòng nhập địa chỉ hiện tại hoặc bấm gọi tổng đài để chúng tôi điều xe nhanh hơn.', [
-                        { label: 'Gọi 0789.999.116', href: 'tel:0789999116', icon: 'fa-phone' }
+                        { label: `Gọi ${supportPhoneText}`, href: `tel:${supportPhone}`, icon: 'fa-phone' }
                     ]);
                 }, {
                     enableHighAccuracy: true,
@@ -613,8 +715,8 @@
 
                 appendMessage('user', value);
                 input.value = '';
-                appendTypingResponse('Đã nhận tin nhắn của bạn. Bạn vui lòng để lại số điện thoại hoặc bấm gọi <a href="tel:0789999116" class="text-primary underline">0789.999.116</a> để được hỗ trợ nhanh nhất.', [
-                    { label: 'Gọi tổng đài', href: 'tel:0789999116', icon: 'fa-phone' }
+                appendTypingResponse(`Đã nhận tin nhắn của bạn. Bạn vui lòng để lại số điện thoại hoặc bấm gọi ${supportPhoneText} để được hỗ trợ nhanh nhất.`, [
+                    { label: 'Gọi tổng đài', href: `tel:${supportPhone}`, icon: 'fa-phone' }
                 ]);
             });
 
@@ -626,8 +728,15 @@
                 setChatOpen(false);
             });
 
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && chat.classList.contains('is-open')) {
+                    setChatOpen(false);
+                    openButton.focus({ preventScroll: true });
+                }
+            });
+
             menuButton.addEventListener('click', function () {
-                appendMessage('bot', 'Bạn có thể chọn nhu cầu hỗ trợ nhanh, gửi vị trí hiện tại hoặc gọi tổng đài <a href="tel:0789999116" class="text-primary underline">0789.999.116</a>.');
+                appendMessage('bot', `Bạn có thể chọn nhu cầu hỗ trợ nhanh, gửi vị trí hiện tại qua Zalo ${zaloPhoneText} hoặc gọi tổng đài ${supportPhoneText}.`);
             });
 
             locationButton.addEventListener('click', requestLocation);
