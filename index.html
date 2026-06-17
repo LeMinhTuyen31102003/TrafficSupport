@@ -5,136 +5,29 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>CỨU HỘ GIAO THÔNG NINH BÌNH 24/7</title>
-    <link rel="icon" href="https://lh3.googleusercontent.com/aida/AP1WRLscalJTUIwrg471cMfaJhTbU_RWCb_fs45iPH0RQPRGKccWrCWVxEvgkLrIevE_03oLWueswl3wBwX0fqXOh0_BDUxYLYfzTPA257cTYkDi-1s9DFsEuM8M3paDd7ieuGgiOtsCZwo1RqRT1jflYO9cAVe9vI_oj8sQapbmfTiEljT7tdLFwL19gEJsvbs_C6XYXOQQTPfmgQoT8uWzWzdypkb3Ux1hY5anuhxwO2oTPYJnrHIIhFVnceA">
-    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/aida/AP1WRLscalJTUIwrg471cMfaJhTbU_RWCb_fs45iPH0RQPRGKccWrCWVxEvgkLrIevE_03oLWueswl3wBwX0fqXOh0_BDUxYLYfzTPA257cTYkDi-1s9DFsEuM8M3paDd7ieuGgiOtsCZwo1RqRT1jflYO9cAVe9vI_oj8sQapbmfTiEljT7tdLFwL19gEJsvbs_C6XYXOQQTPfmgQoT8uWzWzdypkb3Ux1hY5anuhxwO2oTPYJnrHIIhFVnceA">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
-        rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "border": "hsl(var(--border))",
-                        "input": "hsl(var(--input))",
-                        "ring": "hsl(var(--ring))",
-                        "background": "hsl(var(--background))",
-                        "foreground": "hsl(var(--foreground))",
-                        "primary": {
-                            "DEFAULT": "hsl(var(--primary))",
-                            "foreground": "hsl(var(--primary-foreground))"
-                        },
-                        "secondary": {
-                            "DEFAULT": "hsl(var(--secondary))",
-                            "foreground": "hsl(var(--secondary-foreground))"
-                        },
-                        "destructive": {
-                            "DEFAULT": "hsl(var(--destructive))",
-                            "foreground": "hsl(var(--destructive-foreground))"
-                        },
-                        "muted": {
-                            "DEFAULT": "hsl(var(--muted))",
-                            "foreground": "hsl(var(--muted-foreground))"
-                        },
-                        "accent": {
-                            "DEFAULT": "hsl(var(--accent))",
-                            "foreground": "hsl(var(--accent-foreground))"
-                        },
-                        "popover": {
-                            "DEFAULT": "hsl(var(--popover))",
-                            "foreground": "hsl(var(--popover-foreground))"
-                        },
-                        "card": {
-                            "DEFAULT": "hsl(var(--card))",
-                            "foreground": "hsl(var(--card-foreground))"
-                        },
-                        "warning": {
-                            "DEFAULT": "#eab308",
-                            "foreground": "#000000"
-                        }
-                    },
-                    "borderRadius": {
-                        "lg": "var(--radius)",
-                        "md": "calc(var(--radius) - 2px)",
-                        "sm": "calc(var(--radius) - 4px)"
-                    },
-                    "fontFamily": {
-                        "sans": ["Inter", "sans-serif"],
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        :root {
-            --background: 210 40% 98%;
-            --foreground: 222.2 84% 4.9%;
-            --card: 0 0% 100%;
-            --card-foreground: 222.2 84% 4.9%;
-            --popover: 0 0% 100%;
-            --popover-foreground: 222.2 84% 4.9%;
-            --primary: 226 71% 40%;
-            --primary-foreground: 210 40% 98%;
-            --secondary: 210 40% 96.1%;
-            --secondary-foreground: 222.2 47.4% 11.2%;
-            --muted: 210 40% 96.1%;
-            --muted-foreground: 215.4 16.3% 46.9%;
-            --accent: 210 40% 96.1%;
-            --accent-foreground: 222.2 47.4% 11.2%;
-            --destructive: 0 84.2% 60.2%;
-            --destructive-foreground: 210 40% 98%;
-            --border: 214.3 31.8% 91.4%;
-            --input: 214.3 31.8% 91.4%;
-            --ring: 226 71% 40%;
-            --radius: 0.5rem;
-        }
-
-        body {
-            background-color: hsl(var(--background));
-            color: hsl(var(--foreground));
-        }
-
-        .pulse-btn {
-            animation: pulse-red 2.5s infinite;
-        }
-
-        @keyframes pulse-red {
-            0% {
-                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
-            }
-
-            70% {
-                box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
-            }
-        }
-
-        .pulse-zalo {
-            animation: pulse-blue 2.5s infinite;
-        }
-
-        @keyframes pulse-blue {
-            0% {
-                box-shadow: 0 0 0 0 rgba(0, 104, 255, 0.4);
-            }
-
-            70% {
-                box-shadow: 0 0 0 10px rgba(0, 104, 255, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(0, 104, 255, 0);
-            }
-        }
-    </style>
+    <link rel="icon" href="./assets/images/logo.png">
+    <link rel="apple-touch-icon" href="./assets/images/logo.png">
+    <script src="./assets/js/tailwindcss.js"></script>
+    <link href="./assets/fonts/inter/all.css" rel="stylesheet">
+    <link href="./assets/css/all.min.css" rel="stylesheet">
+    <script src="./assets/js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 
 <body class="font-sans min-h-screen bg-[#f8fafc] text-slate-900 selection:bg-primary/20 selection:text-primary">
+    <!--Start of Tawk.to Script-->
+    <script type="text/javascript">
+        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+        (function () {
+            var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = 'https://embed.tawk.to/6a3206b5b319cc1d4d4322f6/1jr9mkdd9';
+            s1.charset = 'UTF-8';
+            s1.setAttribute('crossorigin', '*');
+            s0.parentNode.insertBefore(s1, s0);
+        })();
+    </script>
+    <!--End of Tawk.to Script-->
     <!-- TopAppBar -->
     <header
         class="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
@@ -142,7 +35,7 @@
             <div class="flex items-center gap-2">
                 <a class="flex items-center h-10" href="/">
                     <img alt="Logo" class="h-full w-auto object-contain"
-                        src="https://lh3.googleusercontent.com/aida/AP1WRLscalJTUIwrg471cMfaJhTbU_RWCb_fs45iPH0RQPRGKccWrCWVxEvgkLrIevE_03oLWueswl3wBwX0fqXOh0_BDUxYLYfzTPA257cTYkDi-1s9DFsEuM8M3paDd7ieuGgiOtsCZwo1RqRT1jflYO9cAVe9vI_oj8sQapbmfTiEljT7tdLFwL19gEJsvbs_C6XYXOQQTPfmgQoT8uWzWzdypkb3Ux1hY5anuhxwO2oTPYJnrHIIhFVnceA">
+                        src="./assets/images/logo.png">
                 </a>
             </div>
             <div class="flex items-center gap-4">
@@ -161,7 +54,7 @@
             class="relative w-full py-24 md:py-32 lg:py-40 flex items-center justify-center overflow-hidden border-b border-border bg-white">
             <div class="absolute inset-0 z-0 bg-white/90"></div>
             <div class="absolute inset-0 z-0 bg-cover bg-center opacity-10 mix-blend-multiply"
-                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAur_lC3uvosrVc7yTVw38ZigVGbRr62ihANgLyemfX6VN-0P4mWaCNr9XXJ_HzxVv1jBep8LyEb5L7yFhTHGaYckHrim3b9qal5KbuwGbFtMKGJtzTKWhbOMr08k_xwy3aTdlHtclmI-ZRrJAfByFO4BZ8moHn5PCe5S3Bo8jh5r3k637Msbfj2tCva8YdIFrf2t3hSaIiwx-148EGbz_8djo-PyuLHbceVWToTD7N8Y0uGOOf57Bs-k2SFwpC94Bo3SoCgalskj8');">
+                style="background-image: url('./assets/images/hero-bg.jpg');">
             </div>
             <div
                 class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center gap-6 max-w-4xl">
@@ -457,7 +350,7 @@
             class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12 flex flex-col md:flex-row justify-between items-start gap-8">
             <div class="flex flex-col items-center gap-6">
                 <img alt="Logo" class="h-16 w-auto object-contain"
-                    src="https://lh3.googleusercontent.com/aida/AP1WRLscalJTUIwrg471cMfaJhTbU_RWCb_fs45iPH0RQPRGKccWrCWVxEvgkLrIevE_03oLWueswl3wBwX0fqXOh0_BDUxYLYfzTPA257cTYkDi-1s9DFsEuM8M3paDd7ieuGgiOtsCZwo1RqRT1jflYO9cAVe9vI_oj8sQapbmfTiEljT7tdLFwL19gEJsvbs_C6XYXOQQTPfmgQoT8uWzWzdypkb3Ux1hY5anuhxwO2oTPYJnrHIIhFVnceA">
+                    src="./assets/images/logo.png">
                 <nav class="flex flex-wrap justify-center gap-4 text-sm text-slate-600 font-medium">
                     <a class="hover:text-primary" href="#">Trang chủ</a>
                     <a class="hover:text-primary" href="#dichvu">Dịch vụ</a>
@@ -470,7 +363,7 @@
         </div>
     </footer>
     <!-- Floating Action Buttons -->
-    <div class="fixed bottom-4 right-4 flex flex-col-reverse gap-3 z-50">
+    <div class="fixed bottom-24 right-[27px] flex flex-col-reverse gap-3 z-50">
         <!-- Zalo FAB -->
 
         <!-- Phone FAB -->
