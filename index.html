@@ -15,8 +15,8 @@
 </head>
 
 <body class="font-sans min-h-screen bg-[#f8fafc] text-slate-900 selection:bg-primary/20 selection:text-primary">
-    <!--Start of Tawk.to Script-->
-    <script type="text/javascript">
+    <!-- Start of Tawk.to Script-->
+    <!-- <script type="text/javascript">
         var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
         (function () {
             var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
@@ -26,8 +26,8 @@
             s1.setAttribute('crossorigin', '*');
             s0.parentNode.insertBefore(s1, s0);
         })();
-    </script>
-    <!--End of Tawk.to Script-->
+    </script> -->
+    <!--End of Tawk.to Script -->
     <!-- TopAppBar -->
     <header
         class="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
@@ -39,7 +39,7 @@
                 </a>
             </div>
             <div class="flex items-center gap-4">
-                <a class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-red-600 text-white hover:bg-red-700 pulse-btn shadow-sm"
+                <a class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-red-600 text-white hover:bg-red-700 pulse-red shadow-sm"
                     href="tel:0789999116">
                     <i class="fa-solid fa-phone-volume mr-2 text-lg"></i>
                     GỌI NGAY
@@ -67,7 +67,7 @@
                     nghiệp, thiết bị hiện đại.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 mt-8 w-full sm:w-auto">
-                    <a class="inline-flex items-center justify-center rounded-md text-base font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-14 px-8 bg-red-600 text-white hover:bg-red-700 pulse-btn shadow-lg w-full sm:w-auto"
+                    <a class="inline-flex items-center justify-center rounded-md text-base font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-14 px-8 bg-red-600 text-white hover:bg-red-700 pulse-red shadow-lg w-full sm:w-auto"
                         href="tel:0789999116">
                         <i class="fa-solid fa-phone mr-2 text-xl"></i>
                         <span class="font-bold">BẤM GỌI NGAY</span>
@@ -340,7 +340,7 @@
     <footer class="border-t border-border bg-white" id="lienhe">
         <div class="py-16 text-center border-b border-border/50 px-4 bg-slate-50">
             <h2 class="text-3xl md:text-4xl font-black mb-8 text-slate-900">BẠN CẦN GIÚP ĐỠ TRÊN ĐƯỜNG?</h2>
-            <a class="inline-flex items-center justify-center rounded-full text-lg font-bold ring-offset-background transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-14 px-8 bg-red-600 text-white pulse-btn shadow-xl mx-auto"
+            <a class="inline-flex items-center justify-center rounded-full text-lg font-bold ring-offset-background transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-14 px-8 bg-red-600 text-white pulse-red shadow-xl mx-auto"
                 href="tel:0789999116">
                 <i class="fa-solid fa-phone-volume mr-2 text-xl"></i>
                 GỌI CỨU HỘ NGAY
@@ -362,18 +362,258 @@
             </div>
         </div>
     </footer>
-    <!-- Floating Action Buttons -->
-    <div class="fixed bottom-24 right-[27px] flex flex-col-reverse gap-3 z-50">
-        <!-- Zalo FAB -->
-
-        <!-- Phone FAB -->
-        <a class="w-14 h-14 bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95 pulse-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            href="tel:0789999116">
-            <i class="fa-solid fa-phone text-2xl"></i>
+    <!-- Support Chat Widget -->
+    <div class="support-chat" data-support-chat>
+        <a class="support-chat__phone pulse-red" href="tel:0789999116" aria-label="Gọi cứu hộ ngay">
+            <i class="fa-solid fa-phone"></i>
         </a>
+
+        <section class="support-chat__panel" aria-label="Hỗ trợ trực tuyến" aria-hidden="true">
+            <header class="support-chat__header">
+                <div class="support-chat__brand">
+                    <img src="./assets/images/logo.png" alt="Cứu hộ Ninh Bình" class="support-chat__logo">
+                    <div class="support-chat__title-wrap">
+                        <h2 class="support-chat__title">Hỗ Trợ Trực Tuyến 24/7</h2>
+                        <p class="support-chat__status"><span></span>Chúng tôi có mặt sau 15-20 phút</p>
+                    </div>
+                </div>
+                <div class="support-chat__actions">
+                    <button class="support-chat__icon-btn" type="button" data-chat-menu aria-label="Tùy chọn hỗ trợ">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+                    <button class="support-chat__icon-btn support-chat__close" type="button" data-chat-close
+                        aria-label="Thu gọn chat">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="support-chat__body" data-chat-messages>
+                <div class="support-chat__message support-chat__message--bot">
+                    <div class="support-chat__avatar" aria-hidden="true">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+                    <div class="support-chat__bubble">
+                        Chào bạn! Cứu hộ Ninh Bình 24/7 có thể giúp gì cho bạn ngay bây giờ?
+                    </div>
+                </div>
+
+                <div class="support-chat__quick-replies" aria-label="Chọn nhu cầu hỗ trợ nhanh">
+                    <button type="button" data-chat-option="tow">Cần cẩu kéo xe hỏng</button>
+                    <button type="button" data-chat-option="battery">Kích bình ắc quy</button>
+                    <button type="button" data-chat-option="tire">Vá lốp lưu động</button>
+                    <button type="button" data-chat-option="pricing">Xem bảng giá cứu hộ</button>
+                    <button type="button" data-chat-option="operator">Gặp tổng đài viên</button>
+                </div>
+            </div>
+
+            <form class="support-chat__composer" data-chat-form>
+                <button class="support-chat__add" type="button" data-chat-location aria-label="Gửi vị trí hiện tại">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <input type="text" name="message" autocomplete="off" placeholder="Nhập tin nhắn..."
+                    aria-label="Nhập tin nhắn">
+                <button class="support-chat__send" type="submit" aria-label="Gửi tin nhắn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </section>
+
+        <button class="support-chat__launcher pulse-blue" type="button" data-chat-open aria-label="Mở hỗ trợ trực tuyến"
+            aria-expanded="false">
+            <i class="fa-solid fa-headset"></i>
+            <span>Chat</span>
+        </button>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chat = document.querySelector('[data-support-chat]');
+            if (!chat) return;
 
+            const panel = chat.querySelector('.support-chat__panel');
+            const openButton = chat.querySelector('[data-chat-open]');
+            const closeButton = chat.querySelector('[data-chat-close]');
+            const menuButton = chat.querySelector('[data-chat-menu]');
+            const messageList = chat.querySelector('[data-chat-messages]');
+            const form = chat.querySelector('[data-chat-form]');
+            const input = form.querySelector('input');
+            const locationButton = chat.querySelector('[data-chat-location]');
+
+            const responses = {
+                tow: {
+                    user: 'Cần cẩu kéo xe hỏng',
+                    bot: 'Dịch vụ cẩu kéo của chúng tôi phục vụ toàn tỉnh Ninh Bình. Bạn vui lòng cho biết vị trí hiện tại hoặc gửi định vị để chúng tôi điều xe đến ngay.',
+                    actions: [{ label: 'Gửi vị trí hiện tại', type: 'location', icon: 'fa-location-dot' }]
+                },
+                battery: {
+                    user: 'Kích bình ắc quy',
+                    bot: 'Đội kỹ thuật có thể hỗ trợ kích bình ắc quy tận nơi. Bạn gửi vị trí hiện tại, loại xe và tình trạng xe để chúng tôi báo thời gian đến gần nhất.',
+                    actions: [{ label: 'Gửi vị trí hiện tại', type: 'location', icon: 'fa-location-dot' }]
+                },
+                tire: {
+                    user: 'Vá lốp lưu động',
+                    bot: 'Chúng tôi hỗ trợ vá lốp, thay lốp dự phòng và xử lý sự cố lốp tận nơi. Bạn gửi vị trí và mô tả tình trạng lốp để kỹ thuật viên chuẩn bị đúng dụng cụ.',
+                    actions: [{ label: 'Gửi vị trí hiện tại', type: 'location', icon: 'fa-location-dot' }]
+                },
+                pricing: {
+                    user: 'Xem bảng giá cứu hộ',
+                    bot: 'Bảng giá trên website là mức tham khảo theo loại xe và quãng đường. Bạn có thể xem nhanh mục bảng giá hoặc gọi tổng đài để nhận báo giá chính xác theo vị trí.',
+                    actions: [{ label: 'Mở bảng giá', href: '#banggia', icon: 'fa-list-ul' }]
+                },
+                operator: {
+                    user: 'Gặp tổng đài viên',
+                    bot: 'Tổng đài cứu hộ đang sẵn sàng hỗ trợ. Bạn có thể gọi trực tiếp <a href="tel:0789999116" class="text-primary underline">0789.999.116</a> để được điều phối nhanh nhất.',
+                    actions: [{ label: 'Gọi 0789.999.116', href: 'tel:0789999116', icon: 'fa-phone' }]
+                }
+            };
+
+            function setChatOpen(isOpen) {
+                chat.classList.toggle('is-open', isOpen);
+                panel.setAttribute('aria-hidden', String(!isOpen));
+                openButton.setAttribute('aria-expanded', String(isOpen));
+                if (isOpen) {
+                    requestAnimationFrame(() => input.focus({ preventScroll: true }));
+                    scrollMessages();
+                }
+            }
+
+            function scrollMessages() {
+                messageList.scrollTop = messageList.scrollHeight;
+            }
+
+            function appendMessage(role, text, actions) {
+                const row = document.createElement('div');
+                row.className = `support-chat__message support-chat__message--${role}`;
+
+                if (role === 'bot') {
+                    const avatar = document.createElement('div');
+                    avatar.className = 'support-chat__avatar';
+                    avatar.setAttribute('aria-hidden', 'true');
+                    avatar.innerHTML = '<i class="fa-solid fa-headset"></i>';
+                    row.appendChild(avatar);
+                }
+
+                const bubble = document.createElement('div');
+                bubble.className = 'support-chat__bubble';
+                const paragraph = document.createElement('p');
+                paragraph.innerHTML = text;
+                bubble.appendChild(paragraph);
+
+                if (Array.isArray(actions) && actions.length) {
+                    const actionWrap = document.createElement('div');
+                    actionWrap.className = 'support-chat__bubble-actions';
+
+                    actions.forEach(function (action) {
+                        const control = action.href ? document.createElement('a') : document.createElement('button');
+                        control.className = 'support-chat__bubble-action';
+                        control.innerHTML = `<i class="fa-solid ${action.icon || 'fa-arrow-right'}"></i><span></span>`;
+                        control.querySelector('span').textContent = action.label;
+
+                        if (action.href) {
+                            control.href = action.href;
+                            if (action.href.charAt(0) === '#') {
+                                control.addEventListener('click', function () {
+                                    setChatOpen(false);
+                                });
+                            }
+                        } else {
+                            control.type = 'button';
+                            if (action.type === 'location') {
+                                control.addEventListener('click', requestLocation);
+                            }
+                        }
+
+                        actionWrap.appendChild(control);
+                    });
+
+                    bubble.appendChild(actionWrap);
+                }
+
+                row.appendChild(bubble);
+                messageList.appendChild(row);
+                scrollMessages();
+            }
+
+            function appendTypingResponse(text, actions) {
+                window.setTimeout(function () {
+                    appendMessage('bot', text, actions);
+                }, 280);
+            }
+
+            function requestLocation() {
+                if (!navigator.geolocation) {
+                    appendMessage('bot', 'Trình duyệt của bạn chưa hỗ trợ gửi vị trí. Bạn có thể nhập địa chỉ hiện tại hoặc gọi <a href="tel:0789999116" class="text-primary underline">0789.999.116</a> để được hỗ trợ ngay.');
+                    return;
+                }
+
+                locationButton.classList.add('is-loading');
+                locationButton.setAttribute('aria-busy', 'true');
+
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const latitude = position.coords.latitude.toFixed(6);
+                    const longitude = position.coords.longitude.toFixed(6);
+                    const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+                    locationButton.classList.remove('is-loading');
+                    locationButton.removeAttribute('aria-busy');
+                    appendMessage('user', 'Tôi đã gửi vị trí hiện tại.');
+                    
+                    // Chuyển hướng ngay sang Zalo
+                    window.open('https://zalo.me/0988812116', '_blank');
+
+                    appendTypingResponse(`Đang mở Zalo số 0988.812.116 để bạn gửi vị trí... <br><br>Vị trí của bạn: <a href="${mapsUrl}" target="_blank" class="text-primary underline font-bold">Xem bản đồ</a>.`, [
+                        { label: 'Gọi hỗ trợ ngay', href: 'tel:0789999116', icon: 'fa-phone' }
+                    ]);
+                }, function () {
+                    locationButton.classList.remove('is-loading');
+                    locationButton.removeAttribute('aria-busy');
+                    appendMessage('bot', 'Bạn chưa cấp quyền vị trí. Vui lòng nhập địa chỉ hiện tại hoặc bấm gọi tổng đài để chúng tôi điều xe nhanh hơn.', [
+                        { label: 'Gọi 0789.999.116', href: 'tel:0789999116', icon: 'fa-phone' }
+                    ]);
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                });
+            }
+
+            chat.querySelectorAll('[data-chat-option]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const response = responses[button.dataset.chatOption];
+                    if (!response) return;
+                    appendMessage('user', response.user);
+                    appendTypingResponse(response.bot, response.actions);
+                });
+            });
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const value = input.value.trim();
+                if (!value) return;
+
+                appendMessage('user', value);
+                input.value = '';
+                appendTypingResponse('Đã nhận tin nhắn của bạn. Bạn vui lòng để lại số điện thoại hoặc bấm gọi <a href="tel:0789999116" class="text-primary underline">0789.999.116</a> để được hỗ trợ nhanh nhất.', [
+                    { label: 'Gọi tổng đài', href: 'tel:0789999116', icon: 'fa-phone' }
+                ]);
+            });
+
+            openButton.addEventListener('click', function () {
+                setChatOpen(true);
+            });
+
+            closeButton.addEventListener('click', function () {
+                setChatOpen(false);
+            });
+
+            menuButton.addEventListener('click', function () {
+                appendMessage('bot', 'Bạn có thể chọn nhu cầu hỗ trợ nhanh, gửi vị trí hiện tại hoặc gọi tổng đài <a href="tel:0789999116" class="text-primary underline">0789.999.116</a>.');
+            });
+
+            locationButton.addEventListener('click', requestLocation);
+        });
+    </script>
 </body>
 
 </html>
