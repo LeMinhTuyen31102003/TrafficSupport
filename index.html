@@ -399,6 +399,9 @@
                 </div>
 
                 <div class="support-chat__quick-replies" aria-label="Chọn nhu cầu hỗ trợ nhanh">
+                    <button type="button" class="support-chat__location-btn" data-chat-location-primary>
+                        <i class="fa-solid fa-location-arrow mr-2"></i> GỬI VỊ TRÍ QUA ZALO NGAY
+                    </button>
                     <button type="button" data-chat-option="tow">Cần cẩu kéo xe hỏng</button>
                     <button type="button" data-chat-option="battery">Kích bình ắc quy</button>
                     <button type="button" data-chat-option="tire">Vá lốp lưu động</button>
@@ -559,11 +562,16 @@
                     locationButton.removeAttribute('aria-busy');
                     appendMessage('user', 'Tôi đã gửi vị trí hiện tại.');
                     
-                    // Thử mở app Zalo bằng custom protocol, nếu không được mới dùng link web
-                    const zaloLink = 'zalo://conversation?phone=0988812116';
+                    // Tự động copy link vị trí vào bộ nhớ đệm (Clipboard)
+                    const tempInput = document.createElement('input');
+                    tempInput.value = mapsUrl;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+
+                    // Thử mở app Zalo
                     const webLink = 'https://zalo.me/0988812116';
-                    
-                    // Tạo một liên kết ẩn để kích hoạt mở app
                     const a = document.createElement('a');
                     a.href = webLink; 
                     a.target = '_blank';
@@ -572,8 +580,8 @@
                     a.click();
                     document.body.removeChild(a);
 
-                    appendTypingResponse(`Đang kết nối Zalo 0988.812.116... <br><br>Vị trí của bạn: <a href="${mapsUrl}" target="_blank" class="text-primary underline font-bold">Xem bản đồ</a>.`, [
-                        { label: 'Bấm nếu chưa mở Zalo', href: 'https://zalo.me/0988812116', icon: 'fa-comments' },
+                    appendTypingResponse(`Đã kết nối Zalo 0988.812.116. <br><br><b>Chúng tôi đã tự động copy vị trí của bạn:</b> <br><span class="text-xs text-slate-500">${mapsUrl}</span><br><br>Bạn chỉ cần <b>Dán (Paste)</b> vào trò chuyện Zalo và bấm gửi là xong!`, [
+                        { label: 'Mở lại Zalo', href: 'https://zalo.me/0988812116', icon: 'fa-comments' },
                         { label: 'Gọi hỗ trợ ngay', href: 'tel:0789999116', icon: 'fa-phone' }
                     ]);
                 }, function () {
@@ -623,6 +631,11 @@
             });
 
             locationButton.addEventListener('click', requestLocation);
+
+            const primaryLocationBtn = chat.querySelector('[data-chat-location-primary]');
+            if (primaryLocationBtn) {
+                primaryLocationBtn.addEventListener('click', requestLocation);
+            }
         });
     </script>
 </body>

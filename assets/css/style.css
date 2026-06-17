@@ -397,6 +397,20 @@ body {
     transform: translateY(-1px);
 }
 
+.support-chat__quick-replies button.support-chat__location-btn {
+    background: #0068ff;
+    color: #ffffff;
+    border-color: #0061ed;
+    font-weight: 700;
+    width: 100%;
+}
+
+.support-chat__quick-replies button.support-chat__location-btn:hover {
+    background: #005ae0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 104, 255, 0.24);
+}
+
 .support-chat__composer {
     flex: 0 0 auto;
     display: grid;
