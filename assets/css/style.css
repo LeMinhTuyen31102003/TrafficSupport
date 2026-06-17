@@ -593,9 +593,16 @@ body {
     transform: scale(0.94);
 }
 
+.support-chat__composer.is-loading .support-chat__send i,
 .support-chat__add.is-loading i,
 .support-chat__location-btn.is-loading i {
     animation: chat-spin 800ms linear infinite;
+}
+
+.support-chat__composer input:disabled,
+.support-chat__send:disabled {
+    cursor: progress;
+    opacity: 0.72;
 }
 
 .support-chat__send {

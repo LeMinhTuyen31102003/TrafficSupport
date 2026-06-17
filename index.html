@@ -353,12 +353,12 @@
                 <img alt="Logo" class="h-16 w-auto object-contain"
                     src="./assets/images/logo.png">
                 <nav class="flex flex-wrap justify-center gap-4 text-sm text-slate-600 font-medium">
-                    <a class="hover:text-primary" href="#">Trang chủ</a>
+                    <a class="hover:text-primary" href="/">Trang chủ</a>
                     <a class="hover:text-primary" href="#dichvu">Dịch vụ</a>
                     <a class="hover:text-primary" href="#banggia">Bảng giá</a>
                     <a class="hover:text-primary" href="#lienhe">Liên hệ</a>
                 </nav>
-                <p class="text-xs text-slate-400 text-center">© 2024 Cứu Hộ Ninh Bình 24/7. Chuyên nghiệp - Tốc độ - An
+                <p class="text-xs text-slate-400 text-center">© 2026 Cứu Hộ Ninh Bình 24/7. Chuyên nghiệp - Tốc độ - An
                     toàn.</p>
             </div>
         </div>
@@ -454,6 +454,12 @@
             const zaloPhone = '0988812116';
             const zaloPhoneText = '0988.812.116';
             const zaloUrl = `https://zalo.me/${zaloPhone}`;
+            const chatProxyUrl = window.SUPPORT_CHAT_PROXY_URL || '/api/chat';
+            const chatContextUrl = window.SUPPORT_CHAT_CONTEXT_URL || './context.md';
+            const sendButton = form.querySelector('.support-chat__send');
+            const chatHistory = [];
+            let chatContextPromise = null;
+            let isChatSubmitting = false;
 
             const responses = {
                 tow: {
@@ -605,7 +611,18 @@
                 document.body.removeChild(anchor);
             }
 
-            function appendMessage(role, text, actions) {
+            function rememberChatMessage(role, text) {
+                chatHistory.push({
+                    role: role === 'user' ? 'user' : 'assistant',
+                    content: String(text).slice(0, 1200)
+                });
+
+                if (chatHistory.length > 12) {
+                    chatHistory.splice(0, chatHistory.length - 12);
+                }
+            }
+
+            function appendMessage(role, text, actions, options) {
                 const row = document.createElement('div');
                 row.className = `support-chat__message support-chat__message--${role}`;
 
@@ -660,12 +677,189 @@
                 row.appendChild(bubble);
                 messageList.appendChild(row);
                 scrollMessages();
+
+                if (!options || options.remember !== false) {
+                    rememberChatMessage(role, text);
+                }
+
+                return row;
             }
 
             function appendTypingResponse(text, actions) {
                 window.setTimeout(function () {
                     appendMessage('bot', text, actions);
                 }, 280);
+            }
+
+            function removeMessage(row) {
+                if (row && row.parentNode) {
+                    row.parentNode.removeChild(row);
+                }
+            }
+
+            function setComposerLoading(isLoading) {
+                input.disabled = isLoading;
+                sendButton.disabled = isLoading;
+                form.classList.toggle('is-loading', isLoading);
+
+                if (isLoading) {
+                    form.setAttribute('aria-busy', 'true');
+                } else {
+                    form.removeAttribute('aria-busy');
+                }
+            }
+
+            function loadChatContext() {
+                if (!chatContextPromise) {
+                    chatContextPromise = fetch(chatContextUrl, { cache: 'no-store' })
+                        .then(function (response) {
+                            if (!response.ok) return '';
+                            return response.text();
+                        })
+                        .catch(function () {
+                            return '';
+                        });
+                }
+
+                return chatContextPromise;
+            }
+
+            function getChatInstructions() {
+                return [
+                    'Bạn là trợ lý chat của dịch vụ cứu hộ giao thông Ninh Bình 24/7.',
+                    'Trả lời bằng tiếng Việt, ngắn gọn, rõ ràng, ưu tiên hướng khách gửi vị trí hoặc gọi hotline khi cần cứu hộ gấp.',
+                    'Dựa trên nội dung context.md được gửi kèm. Nếu context.md không có thông tin chắc chắn, hãy nói chưa có thông tin và đề nghị gọi tổng đài.',
+                    `Hotline chính: ${supportPhoneText}. Zalo nhận vị trí: ${zaloPhoneText}.`
+                ].join('\n');
+            }
+
+            function readChatApiText(data) {
+                if (typeof data === 'string') return data.trim();
+                if (!data || typeof data !== 'object') return '';
+
+                if (Array.isArray(data.candidates) && data.candidates[0]) {
+                    const parts = data.candidates[0].content && data.candidates[0].content.parts;
+                    if (Array.isArray(parts)) {
+                        return parts.map(function (part) {
+                            return typeof part.text === 'string' ? part.text : '';
+                        }).join('').trim();
+                    }
+                }
+
+                const directText = data.answer || data.reply || data.message || data.output_text || data.text || data.content;
+                if (typeof directText === 'string') return directText.trim();
+
+                if (Array.isArray(data.choices) && data.choices[0]) {
+                    const choice = data.choices[0];
+                    const content = choice.message && choice.message.content;
+                    if (typeof content === 'string') return content.trim();
+                }
+
+                if (Array.isArray(data.output)) {
+                    const outputText = data.output.map(function (item) {
+                        if (!Array.isArray(item.content)) return '';
+                        return item.content.map(function (part) {
+                            return typeof part.text === 'string' ? part.text : '';
+                        }).join('');
+                    }).join('');
+
+                    return outputText.trim();
+                }
+
+                return '';
+            }
+
+            function normalizeChatApiActions(actions) {
+                if (!Array.isArray(actions)) return [];
+
+                return actions.map(function (action) {
+                    if (!action || typeof action.label !== 'string') return null;
+
+                    const normalized = {
+                        label: action.label.slice(0, 80),
+                        icon: typeof action.icon === 'string' ? action.icon : 'fa-arrow-right'
+                    };
+
+                    if (action.type === 'location') {
+                        normalized.type = 'location';
+                    } else if (typeof action.href === 'string' && /^(https?:|tel:|#)/.test(action.href)) {
+                        normalized.href = action.href;
+                    } else {
+                        return null;
+                    }
+
+                    return normalized;
+                }).filter(Boolean).slice(0, 3);
+            }
+
+            function parseChatApiResponse(data) {
+                return {
+                    text: readChatApiText(data),
+                    actions: normalizeChatApiActions(data && (data.actions || data.suggestions))
+                };
+            }
+
+            function requestChatAnswer(message) {
+                return loadChatContext().then(function (context) {
+                    return fetch(chatProxyUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            context: String(context || '').slice(0, 20000),
+                            instructions: getChatInstructions(),
+                            history: chatHistory.slice(-10),
+                            contact: {
+                                hotline: supportPhone,
+                                hotlineText: supportPhoneText,
+                                zalo: zaloPhone,
+                                zaloText: zaloPhoneText
+                            }
+                        })
+                    });
+                }).then(function (response) {
+                    if (!response.ok) {
+                        throw new Error(`Chat proxy returned ${response.status}`);
+                    }
+
+                    return response.json();
+                }).then(function (data) {
+                    const parsed = parseChatApiResponse(data);
+                    if (!parsed.text) {
+                        throw new Error('Gemini response has no answer text');
+                    }
+
+                    return parsed;
+                });
+            }
+
+            function handleFreeformMessage(value) {
+                if (isChatSubmitting) return;
+
+                isChatSubmitting = true;
+                setComposerLoading(true);
+                const loadingRow = appendMessage('bot', 'Đang kiểm tra thông tin để trả lời bạn...', null, { remember: false });
+
+                requestChatAnswer(value).then(function (result) {
+                    removeMessage(loadingRow);
+                    appendMessage('bot', result.text, result.actions);
+                }).catch(function () {
+                    removeMessage(loadingRow);
+                    appendMessage('bot', `Hiện chưa kết nối được Gemini. Bạn vui lòng gọi ${supportPhoneText} hoặc gửi vị trí qua Zalo ${zaloPhoneText} để được hỗ trợ ngay.`, [
+                        { label: `Gọi ${supportPhoneText}`, href: `tel:${supportPhone}`, icon: 'fa-phone' },
+                        { label: `Mở Zalo ${zaloPhoneText}`, href: zaloUrl, icon: 'fa-comments' }
+                    ]);
+                }).finally(function () {
+                    isChatSubmitting = false;
+                    setComposerLoading(false);
+
+                    if (chat.classList.contains('is-open') && window.matchMedia('(min-width: 641px)').matches) {
+                        requestAnimationFrame(() => input.focus({ preventScroll: true }));
+                    }
+                });
             }
 
             function requestLocation() {
@@ -725,9 +919,7 @@
 
                 appendMessage('user', value);
                 input.value = '';
-                appendTypingResponse(`Đã nhận tin nhắn của bạn. Bạn vui lòng để lại số điện thoại hoặc bấm gọi ${supportPhoneText} để được hỗ trợ nhanh nhất.`, [
-                    { label: 'Gọi tổng đài', href: `tel:${supportPhone}`, icon: 'fa-phone' }
-                ]);
+                handleFreeformMessage(value);
             });
 
             openButton.addEventListener('click', function () {
