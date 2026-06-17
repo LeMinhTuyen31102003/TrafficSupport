@@ -364,6 +364,10 @@
     </footer>
     <!-- Support Chat Widget -->
     <div class="support-chat" data-support-chat>
+        <button class="support-chat__totop" type="button" data-scroll-top aria-label="Lên đầu trang">
+            <i class="fa-solid fa-arrow-up"></i>
+        </button>
+
         <a class="support-chat__phone pulse-red" href="tel:0789999116" aria-label="Gọi cứu hộ ngay">
             <i class="fa-solid fa-phone"></i>
         </a>
@@ -436,6 +440,7 @@
 
             const panel = chat.querySelector('.support-chat__panel');
             const openButton = chat.querySelector('[data-chat-open]');
+            const topButton = chat.querySelector('[data-scroll-top]');
             const closeButton = chat.querySelector('[data-chat-close]');
             const menuButton = chat.querySelector('[data-chat-menu]');
             const messageList = chat.querySelector('[data-chat-messages]');
@@ -491,6 +496,10 @@
                 if (isOpen) {
                     scrollMessages();
                 }
+            }
+
+            function updateTopButton() {
+                chat.classList.toggle('has-scrolled', window.scrollY > 360);
             }
 
             function scrollMessages() {
@@ -723,6 +732,16 @@
             openButton.addEventListener('click', function () {
                 setChatOpen(true);
             });
+
+            topButton.addEventListener('click', function () {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            window.addEventListener('scroll', updateTopButton, { passive: true });
+            updateTopButton();
 
             closeButton.addEventListener('click', function () {
                 setChatOpen(false);
