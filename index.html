@@ -22,6 +22,26 @@
 
         gtag('config', 'AW-18175131215');
     </script>
+
+    <!-- Event snippet for Lượt yêu cầu thông tin báo giá conversion page
+    In your html page, add the snippet and call gtag_report_conversion when someone clicks on the chosen link or button. -->
+    <script>
+        function gtag_report_conversion(url) {
+            var callback = function () {
+                if (typeof (url) != 'undefined') {
+                    window.location = url;
+                }
+            };
+            gtag('event', 'conversion', {
+                'send_to': 'AW-18175131215/hvtKCN_sm8EcEM_8ydpD',
+                'value': 1.0,
+                'currency': 'VND',
+                'event_callback': callback
+            });
+            return false;
+        }
+    </script>
+
 </head>
 
 <body class="font-sans min-h-screen bg-[#f8fafc] text-slate-900 selection:bg-primary/20 selection:text-primary">
