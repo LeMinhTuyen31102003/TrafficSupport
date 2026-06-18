@@ -2,9 +2,13 @@ name = "traffic-support-chat"
 main = "gemini-chat-worker.js"
 compatibility_date = "2026-06-17"
 
+[observability]
+enabled = true
+head_sampling_rate = 1.0
+
 [vars]
-GEMINI_MODEL = "gemini-3.5-flash"
-GEMINI_FALLBACK_MODELS = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_FALLBACK_MODELS = "gemini-3.5-flash"
 GEMINI_TIMEOUT_MS = "60000"
 MAX_CONTEXT_CHARS = "12000"
 # Replace this with your real website origin before deploying.
