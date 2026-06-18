@@ -458,8 +458,11 @@
             const chatContextUrl = window.SUPPORT_CHAT_CONTEXT_URL || './context.md';
             const sendButton = form.querySelector('.support-chat__send');
             const chatHistory = [];
+            const mobileChatQuery = window.matchMedia('(max-width: 640px)');
             let chatContextPromise = null;
             let isChatSubmitting = false;
+            let isPageScrollLocked = false;
+            let lockedScrollY = 0;
 
             const responses = {
                 tow: {
@@ -491,9 +494,13 @@
 
             function setChatOpen(isOpen) {
                 chat.classList.toggle('is-open', isOpen);
-                document.body.classList.toggle('support-chat-open', isOpen);
+                setPageScrollLock(isOpen);
                 panel.setAttribute('aria-hidden', String(!isOpen));
                 openButton.setAttribute('aria-expanded', String(isOpen));
+
+                if (!isOpen) {
+                    input.blur();
+                }
 
                 if (isOpen && window.matchMedia('(min-width: 641px)').matches) {
                     requestAnimationFrame(() => input.focus({ preventScroll: true }));
@@ -502,6 +509,68 @@
 
                 if (isOpen) {
                     scrollMessages();
+                }
+            }
+
+            function updateChatViewportHeight() {
+                const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                document.documentElement.style.setProperty('--support-chat-viewport-height', `${Math.round(viewportHeight)}px`);
+            }
+
+            function lockPageScroll() {
+                if (isPageScrollLocked || !mobileChatQuery.matches) return;
+
+                lockedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+                updateChatViewportHeight();
+                document.documentElement.classList.add('support-chat-open');
+                document.body.classList.add('support-chat-open');
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${lockedScrollY}px`;
+                document.body.style.left = '0';
+                document.body.style.right = '0';
+                document.body.style.width = '100%';
+                isPageScrollLocked = true;
+            }
+
+            function unlockPageScroll() {
+                if (!isPageScrollLocked) {
+                    document.documentElement.classList.remove('support-chat-open');
+                    document.body.classList.remove('support-chat-open');
+                    return;
+                }
+
+                document.documentElement.classList.remove('support-chat-open');
+                document.body.classList.remove('support-chat-open');
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.left = '';
+                document.body.style.right = '';
+                document.body.style.width = '';
+                isPageScrollLocked = false;
+                window.scrollTo(0, lockedScrollY);
+            }
+
+            function setPageScrollLock(isLocked) {
+                if (isLocked) {
+                    if (mobileChatQuery.matches) {
+                        lockPageScroll();
+                    }
+                    return;
+                }
+
+                unlockPageScroll();
+            }
+
+            function handleChatViewportChange() {
+                if (!chat.classList.contains('is-open')) return;
+
+                updateChatViewportHeight();
+                scrollMessages();
+
+                if (!mobileChatQuery.matches) {
+                    unlockPageScroll();
+                } else {
+                    lockPageScroll();
                 }
             }
 
@@ -809,9 +878,9 @@
                         },
                         body: JSON.stringify({
                             message: message,
-                            context: String(context || '').slice(0, 20000),
+                            context: String(context || '').slice(0, 12000),
                             instructions: getChatInstructions(),
-                            history: chatHistory.slice(-10),
+                            history: chatHistory.slice(-6),
                             contact: {
                                 hotline: supportPhone,
                                 hotlineText: supportPhoneText,
@@ -841,7 +910,7 @@
 
                 isChatSubmitting = true;
                 setComposerLoading(true);
-                const loadingRow = appendMessage('bot', 'Em đang suy nghĩ ạ...', null, { remember: false });
+                const loadingRow = appendMessage('bot', 'Xin đợi em 1 lát ạ...', null, { remember: false });
 
                 requestChatAnswer(value).then(function (result) {
                     removeMessage(loadingRow);
@@ -935,6 +1004,16 @@
             });
 
             window.addEventListener('scroll', updateTopButton, { passive: true });
+            window.addEventListener('resize', handleChatViewportChange, { passive: true });
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', handleChatViewportChange, { passive: true });
+                window.visualViewport.addEventListener('scroll', handleChatViewportChange, { passive: true });
+            }
+            if (mobileChatQuery.addEventListener) {
+                mobileChatQuery.addEventListener('change', handleChatViewportChange);
+            } else if (mobileChatQuery.addListener) {
+                mobileChatQuery.addListener(handleChatViewportChange);
+            }
             updateTopButton();
 
             closeButton.addEventListener('click', function () {

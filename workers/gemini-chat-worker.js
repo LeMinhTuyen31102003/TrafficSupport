@@ -1,6 +1,12 @@
 const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
-const DEFAULT_MODEL = "gemini-3.5-flash";
-const DEFAULT_FALLBACK_MODELS = ["gemini-2.5-flash"];
+const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_FALLBACK_MODELS = ["gemini-2.0-flash"];
+const DEFAULT_CONTEXT_CHARS = 12000;
+const DEFAULT_MESSAGE_CHARS = 2500;
+const DEFAULT_HISTORY_ITEMS = 6;
+const DEFAULT_HISTORY_CHARS = 800;
+const DEFAULT_OUTPUT_TOKENS = 450;
+const DEFAULT_TIMEOUT_MS = 25000;
 
 function jsonResponse(data, status, headers) {
     return new Response(JSON.stringify(data), {
@@ -51,24 +57,35 @@ function readGeminiText(data) {
         .trim();
 }
 
-function normalizeHistory(history) {
+function readNumber(value, fallback, min, max) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return fallback;
+    return Math.max(min, Math.min(max, Math.round(number)));
+}
+
+function normalizeHistory(history, env) {
     if (!Array.isArray(history)) return "";
 
+    const maxItems = readNumber(env.MAX_HISTORY_ITEMS, DEFAULT_HISTORY_ITEMS, 0, 12);
+    const maxChars = readNumber(env.MAX_HISTORY_CHARS, DEFAULT_HISTORY_CHARS, 200, 2000);
+
     return history
-        .slice(-8)
+        .slice(-maxItems)
         .map((item) => {
             const role = item?.role === "user" ? "Customer" : "Assistant";
-            const content = String(item?.content || "").slice(0, 1200);
+            const content = String(item?.content || "").slice(0, maxChars);
             return content ? `${role}: ${content}` : "";
         })
         .filter(Boolean)
         .join("\n");
 }
 
-function buildPrompt(body) {
-    const context = String(body.context || "").slice(0, 20000);
-    const history = normalizeHistory(body.history);
-    const message = String(body.message || "").slice(0, 3000);
+function buildPrompt(body, env) {
+    const maxContextChars = readNumber(env.MAX_CONTEXT_CHARS, DEFAULT_CONTEXT_CHARS, 2000, 30000);
+    const maxMessageChars = readNumber(env.MAX_MESSAGE_CHARS, DEFAULT_MESSAGE_CHARS, 500, 5000);
+    const context = String(body.context || "").slice(0, maxContextChars);
+    const history = normalizeHistory(body.history, env);
+    const message = String(body.message || "").slice(0, maxMessageChars);
     const contact = body.contact || {};
 
     return [
@@ -98,7 +115,9 @@ function getGeminiUrl(model) {
     return `${GEMINI_API_BASE}/${encodeURIComponent(model)}:generateContent`;
 }
 
-function buildGeminiPayload(body, systemInstruction) {
+function buildGeminiPayload(body, systemInstruction, env) {
+    const maxOutputTokens = readNumber(env.MAX_OUTPUT_TOKENS, DEFAULT_OUTPUT_TOKENS, 160, 1200);
+
     return {
         system_instruction: {
             parts: [{ text: systemInstruction }]
@@ -106,12 +125,12 @@ function buildGeminiPayload(body, systemInstruction) {
         contents: [
             {
                 role: "user",
-                parts: [{ text: buildPrompt(body) }]
+                parts: [{ text: buildPrompt(body, env) }]
             }
         ],
         generationConfig: {
             temperature: 0.35,
-            maxOutputTokens: 700
+            maxOutputTokens
         }
     };
 }
@@ -133,11 +152,14 @@ function canTryNextModel(status) {
 }
 
 async function requestGemini(env, body, systemInstruction) {
-    const payload = buildGeminiPayload(body, systemInstruction);
+    const payload = buildGeminiPayload(body, systemInstruction, env);
+    const timeoutMs = readNumber(env.GEMINI_TIMEOUT_MS, DEFAULT_TIMEOUT_MS, 5000, 50000);
     let lastError = null;
 
     for (const model of getGeminiModels(env)) {
         let response;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort("Gemini request timeout"), timeoutMs);
 
         try {
             response = await fetch(getGeminiUrl(model), {
@@ -147,15 +169,19 @@ async function requestGemini(env, body, systemInstruction) {
                     "Content-Type": "application/json",
                     "x-goog-api-key": env.GEMINI_API_KEY
                 },
+                signal: controller.signal,
                 body: JSON.stringify(payload)
             });
         } catch (error) {
             lastError = {
                 error: "Gemini fetch failed",
                 model,
-                detail: error instanceof Error ? error.message : String(error)
+                detail: error instanceof Error ? error.message : String(error),
+                timeoutMs
             };
             continue;
+        } finally {
+            clearTimeout(timeoutId);
         }
 
         if (response.ok) {

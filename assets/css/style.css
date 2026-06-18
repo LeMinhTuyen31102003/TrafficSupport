@@ -622,8 +622,11 @@ body {
 }
 
 @media (max-width: 640px) {
+    html.support-chat-open,
     body.support-chat-open {
         overflow: hidden;
+        overscroll-behavior: none;
+        height: 100%;
     }
 
     .support-chat {
@@ -637,10 +640,13 @@ body {
         width: 100vw;
         height: 100vh;
         height: 100dvh;
+        height: var(--support-chat-viewport-height, 100dvh);
+        max-height: var(--support-chat-viewport-height, 100dvh);
         min-height: 0;
         border: 0;
         border-radius: 0;
         transform: translateY(18px);
+        overscroll-behavior: contain;
         background:
             radial-gradient(circle at 100% 0%, rgba(6, 39, 127, 0.1), transparent 40%),
             linear-gradient(180deg, #f8fbff 0%, #f2f6fb 48%, #eef3f8 100%);
@@ -668,6 +674,8 @@ body {
 
     .support-chat__body {
         padding: 18px 12px 16px;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
     }
 
     .support-chat__message {
