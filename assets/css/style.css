@@ -634,10 +634,21 @@ body {
         bottom: calc(16px + env(safe-area-inset-bottom));
     }
 
+    .support-chat.is-open {
+        inset: 0;
+        width: var(--support-chat-viewport-width, 100vw);
+        height: var(--support-chat-viewport-height, 100dvh);
+        pointer-events: none;
+    }
+
     .support-chat__panel {
         position: fixed;
-        inset: 0;
-        width: 100vw;
+        inset: auto;
+        top: var(--support-chat-viewport-top, 0px);
+        left: var(--support-chat-viewport-left, 0px);
+        right: auto;
+        bottom: auto;
+        width: var(--support-chat-viewport-width, 100vw);
         height: 100vh;
         height: 100dvh;
         height: var(--support-chat-viewport-height, 100dvh);
@@ -646,7 +657,9 @@ body {
         border: 0;
         border-radius: 0;
         transform: translateY(18px);
+        transform-origin: top center;
         overscroll-behavior: contain;
+        z-index: 100;
         background:
             radial-gradient(circle at 100% 0%, rgba(6, 39, 127, 0.1), transparent 40%),
             linear-gradient(180deg, #f8fbff 0%, #f2f6fb 48%, #eef3f8 100%);

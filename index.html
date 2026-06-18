@@ -491,7 +491,7 @@
             let chatContextPromise = null;
             let isChatSubmitting = false;
             let isPageScrollLocked = false;
-            let lockedScrollY = 0;
+            let lastTouchY = 0;
 
             const responses = {
                 tow: {
@@ -542,22 +542,63 @@
             }
 
             function updateChatViewportHeight() {
-                const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                const viewport = window.visualViewport;
+                const viewportHeight = viewport ? viewport.height : window.innerHeight;
+                const viewportWidth = viewport ? viewport.width : window.innerWidth;
+                const viewportTop = viewport ? viewport.offsetTop : 0;
+                const viewportLeft = viewport ? viewport.offsetLeft : 0;
+
                 document.documentElement.style.setProperty('--support-chat-viewport-height', `${Math.round(viewportHeight)}px`);
+                document.documentElement.style.setProperty('--support-chat-viewport-width', `${Math.round(viewportWidth)}px`);
+                document.documentElement.style.setProperty('--support-chat-viewport-top', `${Math.round(viewportTop)}px`);
+                document.documentElement.style.setProperty('--support-chat-viewport-left', `${Math.round(viewportLeft)}px`);
+            }
+
+            function handleChatTouchStart(event) {
+                if (!chat.classList.contains('is-open') || !mobileChatQuery.matches) return;
+
+                lastTouchY = event.touches && event.touches.length ? event.touches[0].clientY : 0;
+            }
+
+            function shouldAllowMessageScroll(target, currentTouchY) {
+                if (!messageList.contains(target)) return false;
+
+                const deltaY = currentTouchY - lastTouchY;
+                lastTouchY = currentTouchY;
+
+                if (messageList.scrollHeight <= messageList.clientHeight + 1) {
+                    return false;
+                }
+
+                if (deltaY > 0) {
+                    return messageList.scrollTop > 0;
+                }
+
+                if (deltaY < 0) {
+                    return messageList.scrollTop + messageList.clientHeight < messageList.scrollHeight - 1;
+                }
+
+                return true;
+            }
+
+            function preventBackgroundTouchScroll(event) {
+                if (!chat.classList.contains('is-open') || !mobileChatQuery.matches) return;
+                if (!event.touches || !event.touches.length) return;
+
+                const currentTouchY = event.touches[0].clientY;
+                if (shouldAllowMessageScroll(event.target, currentTouchY)) return;
+
+                event.preventDefault();
             }
 
             function lockPageScroll() {
                 if (isPageScrollLocked || !mobileChatQuery.matches) return;
 
-                lockedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
                 updateChatViewportHeight();
                 document.documentElement.classList.add('support-chat-open');
                 document.body.classList.add('support-chat-open');
-                document.body.style.position = 'fixed';
-                document.body.style.top = `-${lockedScrollY}px`;
-                document.body.style.left = '0';
-                document.body.style.right = '0';
-                document.body.style.width = '100%';
+                document.addEventListener('touchstart', handleChatTouchStart, { passive: true });
+                document.addEventListener('touchmove', preventBackgroundTouchScroll, { passive: false });
                 isPageScrollLocked = true;
             }
 
@@ -570,13 +611,9 @@
 
                 document.documentElement.classList.remove('support-chat-open');
                 document.body.classList.remove('support-chat-open');
-                document.body.style.position = '';
-                document.body.style.top = '';
-                document.body.style.left = '';
-                document.body.style.right = '';
-                document.body.style.width = '';
+                document.removeEventListener('touchstart', handleChatTouchStart);
+                document.removeEventListener('touchmove', preventBackgroundTouchScroll);
                 isPageScrollLocked = false;
-                window.scrollTo(0, lockedScrollY);
             }
 
             function setPageScrollLock(isLocked) {
@@ -1018,6 +1055,20 @@
                 appendMessage('user', value);
                 input.value = '';
                 handleFreeformMessage(value);
+            });
+
+            input.addEventListener('focus', function () {
+                if (!mobileChatQuery.matches) return;
+
+                updateChatViewportHeight();
+                window.setTimeout(handleChatViewportChange, 80);
+                window.setTimeout(handleChatViewportChange, 320);
+            });
+
+            input.addEventListener('blur', function () {
+                if (!mobileChatQuery.matches) return;
+
+                window.setTimeout(handleChatViewportChange, 120);
             });
 
             openButton.addEventListener('click', function () {
