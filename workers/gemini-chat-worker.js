@@ -5,8 +5,7 @@ const DEFAULT_CONTEXT_CHARS = 12000;
 const DEFAULT_MESSAGE_CHARS = 2500;
 const DEFAULT_HISTORY_ITEMS = 6;
 const DEFAULT_HISTORY_CHARS = 800;
-const DEFAULT_OUTPUT_TOKENS = 450;
-const DEFAULT_TIMEOUT_MS = 25000;
+const DEFAULT_TIMEOUT_MS = 60000;
 
 function jsonResponse(data, status, headers) {
     return new Response(JSON.stringify(data), {
@@ -63,6 +62,15 @@ function readNumber(value, fallback, min, max) {
     return Math.max(min, Math.min(max, Math.round(number)));
 }
 
+function readOptionalNumber(value, min, max) {
+    if (value === undefined || value === null || String(value).trim() === "") return null;
+
+    const number = Number(value);
+    if (!Number.isFinite(number) || number <= 0) return null;
+
+    return Math.max(min, Math.min(max, Math.round(number)));
+}
+
 function normalizeHistory(history, env) {
     if (!Array.isArray(history)) return "";
 
@@ -116,9 +124,7 @@ function getGeminiUrl(model) {
 }
 
 function buildGeminiPayload(body, systemInstruction, env) {
-    const maxOutputTokens = readNumber(env.MAX_OUTPUT_TOKENS, DEFAULT_OUTPUT_TOKENS, 160, 1200);
-
-    return {
+    const payload = {
         system_instruction: {
             parts: [{ text: systemInstruction }]
         },
@@ -129,10 +135,16 @@ function buildGeminiPayload(body, systemInstruction, env) {
             }
         ],
         generationConfig: {
-            temperature: 0.35,
-            maxOutputTokens
+            temperature: 0.35
         }
     };
+
+    const maxOutputTokens = readOptionalNumber(env.MAX_OUTPUT_TOKENS, 160, 8192);
+    if (maxOutputTokens) {
+        payload.generationConfig.maxOutputTokens = maxOutputTokens;
+    }
+
+    return payload;
 }
 
 async function readErrorDetail(response) {
@@ -153,7 +165,7 @@ function canTryNextModel(status) {
 
 async function requestGemini(env, body, systemInstruction) {
     const payload = buildGeminiPayload(body, systemInstruction, env);
-    const timeoutMs = readNumber(env.GEMINI_TIMEOUT_MS, DEFAULT_TIMEOUT_MS, 5000, 50000);
+    const timeoutMs = readNumber(env.GEMINI_TIMEOUT_MS, DEFAULT_TIMEOUT_MS, 5000, 120000);
     let lastError = null;
 
     for (const model of getGeminiModels(env)) {
